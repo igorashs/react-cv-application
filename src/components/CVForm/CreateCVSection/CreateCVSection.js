@@ -12,7 +12,7 @@ export default class CreateCVSection extends React.Component {
         <Box mt={2.5}>
           <Grid container>
             <Grid item xs={12} md={2}>
-              <Button variant='contained' size='large' fullWidth>
+              <Button variant='contained' size='large' fullWidth type='submit'>
                 Create
               </Button>
             </Grid>
