@@ -1,5 +1,6 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
+import { v4 as uuidv4 } from 'uuid';
 
 import PersonalInformationSection from './PersonalInformationSection';
 import EducationSection from './EducationSection';
@@ -22,7 +23,8 @@ export default class CVForm extends React.Component {
           qualificationTitle: '',
           organization: '',
           fromDate: null,
-          toDate: null
+          toDate: null,
+          id: uuidv4()
         }
       ],
       workExperiences: [
@@ -31,16 +33,19 @@ export default class CVForm extends React.Component {
           employer: '',
           fromDate: null,
           toDate: null,
-          responsibilities: ''
+          responsibilities: '',
+          id: uuidv4()
         }
-      ]
+      ],
+      isEditableForm: true
     };
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
-
-    this.props.onCVCreate({ ...this.state });
+    window.scrollTo(0, 0);
+    this.setState({ isEditableForm: false });
+    // this.props.onCVCreate({ ...this.state });
   };
 
   handlePersonalInfoChange = (field, value) => {
@@ -70,13 +75,24 @@ export default class CVForm extends React.Component {
     });
   };
 
-  // got long night with this one
-  shouldComponentUpdate() {
-    return false;
-  }
+  handleEducationChange = (field, value, index = 0) => {
+    this.setState((prevState) => {
+      let state = { educations: prevState.educations.map((e) => ({ ...e })) };
+
+      switch (field) {
+        case 'qualificationTitle': {
+          state.educations[index].qualificationTitle = value;
+          break;
+        }
+      }
+
+      return state;
+    });
+  };
 
   render() {
-    const { personalInfo, educations } = this.state;
+    const { personalInfo, educations, isEditableForm } = this.state;
+
     return (
       <Grid container component='form' spacing={3} onSubmit={this.handleSubmit}>
         {/* Personal Information */}
@@ -84,19 +100,24 @@ export default class CVForm extends React.Component {
           <PersonalInformationSection
             personalInfo={personalInfo}
             handleChange={this.handlePersonalInfoChange}
+            isEditableForm={isEditableForm}
           />
         </Grid>
         {/* Education and Training*/}
         <Grid item xs={12}>
-          <EducationSection />
+          <EducationSection
+            educations={educations}
+            handleChange={this.handleEducationChange}
+            isEditableForm={isEditableForm}
+          />
         </Grid>
         {/* Work Experience */}
         <Grid item xs={12}>
-          <WorkExperienceSection />
+          {/* <WorkExperienceSection /> */}
         </Grid>
         {/* Create the CV */}
         <Grid item xs={12}>
-          <CreateCVSection />
+          <CreateCVSection isEditableForm={isEditableForm} />
         </Grid>
       </Grid>
     );

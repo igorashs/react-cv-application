@@ -1,16 +1,32 @@
 import React from 'react';
-import { Box, Typography, Divider, TextField, Grid } from '@material-ui/core';
+import { Box, Typography, Divider, Grid } from '@material-ui/core';
+import PersonalInformationInput from './PersonalInformationInput';
+import PersonalInformationView from './PersonalInformationView';
 
 export default class PersonalInformationSection extends React.Component {
-  render() {
-    const {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      handleChange
-    } = this.props;
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      isEditable: false
+    };
+  }
+
+  handleEdit = () => {
+    this.setState((curState) => ({
+      isEditable: !curState.isEditable
+    }));
+  };
+
+  shouldComponentUpdate(nextProp, nextState) {
+    return (
+      nextProp.personalInfo !== this.props.personalInfo ||
+      nextProp.isEditableForm !== this.props.isEditableForm ||
+      nextState.isEditable !== this.state.isEditable
+    );
+  }
+
+  render() {
     return (
       <Box component='section'>
         <Typography variant='h5' component='h3'>
@@ -19,47 +35,19 @@ export default class PersonalInformationSection extends React.Component {
         <Divider />
         <Box mt={2.5}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant='filled'
-                label='First Name'
-                id='first-name'
-                fullWidth
-                value={firstName}
-                onChange={(e) => handleChange('firstName', e.target.value)}
+            {this.props.isEditableForm || this.state.isEditable ? (
+              <PersonalInformationInput
+                info={this.props.personalInfo}
+                handleChange={this.props.handleChange}
+                handleClick={this.handleEdit}
+                isEditable={this.state.isEditable}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant='filled'
-                label='Last Name'
-                id='last-name'
-                fullWidth
-                value={lastName}
-                onChange={(e) => handleChange('lastName', e.target.value)}
+            ) : (
+              <PersonalInformationView
+                info={this.props.personalInfo}
+                handleClick={this.handleEdit}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant='filled'
-                label='Email'
-                type='email'
-                id='email'
-                fullWidth
-                value={email}
-                onChange={(e) => handleChange('email', e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant='filled'
-                label='Phone Number'
-                id='phone-number'
-                fullWidth
-                value={phoneNumber}
-                onChange={(e) => handleChange('phoneNumber', e.target.value)}
-              />
-            </Grid>
+            )}
           </Grid>
         </Box>
       </Box>

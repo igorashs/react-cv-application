@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Divider, Button, Grid } from '@material-ui/core';
 
-export default class CreateCVSection extends React.Component {
+export default class CreateCVSection extends React.PureComponent {
   render() {
     return (
       <Box component='section'>
@@ -13,7 +13,7 @@ export default class CreateCVSection extends React.Component {
           <Grid container>
             <Grid item xs={12} md={2}>
               <Button variant='contained' size='large' fullWidth type='submit'>
-                Create
+                {this.props.isEditableForm ? 'Submit' : 'Create PDF'}
               </Button>
             </Grid>
           </Grid>
