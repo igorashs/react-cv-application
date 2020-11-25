@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, Grid, Button } from '@material-ui/core';
+import { TextField, Grid, Button, Box } from '@material-ui/core';
 
 export default class PersonalInformationInput extends React.Component {
   render() {
@@ -51,9 +51,11 @@ export default class PersonalInformationInput extends React.Component {
         </Grid>
         {isEditable && (
           <Grid item xs={12} sm={6}>
-            <Button variant='contained' color='primary' onClick={handleClick}>
-              Save
-            </Button>
+            <Box display='grid' gridTemplateColumns='90px'>
+              <Button variant='contained' color='primary' onClick={handleClick}>
+                Save
+              </Button>
+            </Box>
           </Grid>
         )}
       </React.Fragment>

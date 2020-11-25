@@ -13,7 +13,7 @@ export default class CreateCVSection extends React.PureComponent {
           <Grid container>
             <Grid item xs={12} md={2}>
               <Button variant='contained' size='large' fullWidth type='submit'>
-                {this.props.isEditableForm ? 'Submit' : 'Create PDF'}
+                {this.props.isEditableForm ? 'Preview' : 'Create PDF'}
               </Button>
             </Grid>
           </Grid>

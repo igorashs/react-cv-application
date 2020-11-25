@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import PersonalInformationSection from './PersonalInformationSection';
 import EducationSection from './EducationSection';
-import WorkExperienceSection from './WorkExperienceSection';
+// import WorkExperienceSection from './WorkExperienceSection';
 import CreateCVSection from './CreateCVSection';
 
 export default class CVForm extends React.Component {
@@ -22,8 +22,9 @@ export default class CVForm extends React.Component {
         {
           qualificationTitle: '',
           organization: '',
-          fromDate: null,
-          toDate: null,
+          fromDate: new Date(),
+          toDate: new Date(),
+          isOngoing: false,
           id: uuidv4()
         }
       ],
@@ -31,8 +32,9 @@ export default class CVForm extends React.Component {
         {
           occupationTitle: '',
           employer: '',
-          fromDate: null,
-          toDate: null,
+          fromDate: new Date(),
+          toDate: new Date(),
+          isOngoing: false,
           responsibilities: '',
           id: uuidv4()
         }
@@ -46,6 +48,33 @@ export default class CVForm extends React.Component {
     window.scrollTo(0, 0);
     this.setState({ isEditableForm: false });
     // this.props.onCVCreate({ ...this.state });
+  };
+
+  handleAddEducation = () => {
+    this.setState((prevState) => {
+      let state = { educations: prevState.educations.map((e) => ({ ...e })) };
+
+      state.educations.push({
+        qualificationTitle: '',
+        organization: '',
+        fromDate: new Date(),
+        toDate: new Date(),
+        isOngoing: false,
+        id: uuidv4()
+      });
+
+      return state;
+    });
+  };
+
+  handleDeleteEducation = (id) => {
+    this.setState((prevState) => {
+      let state = {
+        educations: prevState.educations.filter((e) => e.id !== id)
+      };
+
+      return state;
+    });
   };
 
   handlePersonalInfoChange = (field, value) => {
@@ -75,15 +104,36 @@ export default class CVForm extends React.Component {
     });
   };
 
-  handleEducationChange = (field, value, index = 0) => {
+  handleEducationChange = (field, value, id) => {
     this.setState((prevState) => {
       let state = { educations: prevState.educations.map((e) => ({ ...e })) };
+      const education = state.educations.find((edu) => edu.id === id);
 
       switch (field) {
         case 'qualificationTitle': {
-          state.educations[index].qualificationTitle = value;
+          education.qualificationTitle = value;
           break;
         }
+        case 'organization':
+          {
+            education.organization = value;
+          }
+          break;
+        case 'fromDate':
+          {
+            education.fromDate = value;
+          }
+          break;
+        case 'toDate':
+          {
+            education.toDate = value;
+          }
+          break;
+        case 'isOngoing':
+          {
+            education.isOngoing = value;
+          }
+          break;
       }
 
       return state;
@@ -108,6 +158,8 @@ export default class CVForm extends React.Component {
           <EducationSection
             educations={educations}
             handleChange={this.handleEducationChange}
+            handleAdd={this.handleAddEducation}
+            handleDelete={this.handleDeleteEducation}
             isEditableForm={isEditableForm}
           />
         </Grid>

@@ -4,14 +4,21 @@ import { Box, Typography, Divider, Button, Grid } from '@material-ui/core';
 import EducationList from './EducationList';
 
 export default class EducationSection extends React.Component {
-  shouldComponentUpdate(nextProps) {
-    return nextProps.educations !== this.props.educations;
+  shouldComponentUpdate(nextProp) {
+    return (
+      nextProp.educations !== this.props.educations ||
+      nextProp.isEditableForm !== this.props.isEditableForm
+    );
   }
 
   render() {
-    const { educations, handleChange, isEditableForm } = this.props;
-
-    // TODO add/delete new item
+    const {
+      educations,
+      handleChange,
+      isEditableForm,
+      handleAdd,
+      handleDelete
+    } = this.props;
 
     return (
       <Box component='section'>
@@ -24,9 +31,16 @@ export default class EducationSection extends React.Component {
             educations={educations}
             handleChange={handleChange}
             isEditableForm={isEditableForm}
+            handleDelete={handleDelete}
           />
           <Grid item xs={12} md={2}>
-            <Button variant='contained' color='primary' size='large' fullWidth>
+            <Button
+              variant='contained'
+              color='primary'
+              size='large'
+              fullWidth
+              onClick={handleAdd}
+            >
               Add
             </Button>
           </Grid>
