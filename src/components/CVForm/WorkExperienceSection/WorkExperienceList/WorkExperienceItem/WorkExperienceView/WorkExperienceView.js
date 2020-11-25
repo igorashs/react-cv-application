@@ -5,13 +5,14 @@ import { format } from 'date-fns';
 export default class EducationView extends React.Component {
   render() {
     const {
-      qualificationTitle,
-      organization,
+      occupationTitle,
+      employer,
       fromDate,
       toDate,
       isOngoing,
+      responsibilities,
       id
-    } = this.props.education;
+    } = this.props.workExperience;
     const { handleEditClick, handleDeleteClick, isAlone } = this.props;
 
     return (
@@ -24,8 +25,9 @@ export default class EducationView extends React.Component {
             alignItems='start'
           >
             <Box>
-              <Typography variant='h6'>{qualificationTitle}</Typography>
-              <Typography variant='subtitle1'>{organization}</Typography>
+              <Typography variant='h6'>{occupationTitle}</Typography>
+              <Typography variant='subtitle1'>{employer}</Typography>
+              <Typography variant='subtitle1'>{responsibilities}</Typography>
               <Typography variant='subtitle1'>
                 {format(fromDate, 'MM/dd/yyyy') +
                   (isOngoing
