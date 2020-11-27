@@ -22,7 +22,8 @@ export default class PersonalInformationSection extends React.Component {
     return (
       nextProp.personalInfo !== this.props.personalInfo ||
       nextProp.isEditableForm !== this.props.isEditableForm ||
-      nextState.isEditable !== this.state.isEditable
+      nextState.isEditable !== this.state.isEditable ||
+      nextProp.errors !== this.props.errors
     );
   }
 
@@ -38,6 +39,7 @@ export default class PersonalInformationSection extends React.Component {
             {this.props.isEditableForm || this.state.isEditable ? (
               <PersonalInformationInput
                 info={this.props.personalInfo}
+                errors={this.props.errors}
                 handleChange={this.props.handleChange}
                 handleClick={this.handleEdit}
                 isEditable={this.state.isEditable}

@@ -7,6 +7,8 @@ import EducationSection from './EducationSection';
 import WorkExperienceSection from './WorkExperienceSection';
 import CreateCVSection from './CreateCVSection';
 
+import validator from '../../lib/validator';
+
 export default class CVForm extends React.Component {
   constructor(props) {
     super(props);
@@ -39,6 +41,34 @@ export default class CVForm extends React.Component {
           id: uuidv4()
         }
       ],
+      sectionsErrors: {
+        personalInfo: {
+          isValid: false,
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNumber: ''
+        },
+        educations: [
+          {
+            isValid: false,
+            qualificationTitle: '',
+            organization: '',
+            fromDate: '',
+            toDate: ''
+          }
+        ],
+        workExperiences: [
+          {
+            isValid: false,
+            occupationTitle: '',
+            employer: '',
+            fromDate: '',
+            toDate: '',
+            responsibilities: ''
+          }
+        ]
+      },
       isEditableForm: true,
       isPreview: false
     };
@@ -46,40 +76,97 @@ export default class CVForm extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const { personalInfo, educations, workExperiences } = this.state;
 
     if (!this.state.isPreview) {
       window.scrollTo(0, 0);
-      this.setState({ isEditableForm: false, isPreview: true });
+      const { sectionsErrors: errors } = this.state;
+
+      if (
+        errors.personalInfo.isValid &&
+        errors.educations.find((ed) => !ed.isValid) === 'undefined' &&
+        errors.workExperiences.find((we) => !we.isValid) === 'undefined'
+      ) {
+        this.setState({ isEditableForm: false, isPreview: true });
+      } else {
+        this.setState((prevState) => {
+          const state = {
+            sectionsErrors: {
+              personalInfo: { ...prevState.sectionsErrors.personalInfo },
+              educations: prevState.sectionsErrors.educations.map((e) => ({
+                ...e
+              })),
+              workExperiences: prevState.sectionsErrors.workExperiences.map(
+                (w) => ({
+                  ...w
+                })
+              )
+            }
+          };
+
+          state.sectionsErrors.personalInfo = validator.validatePersonalInformation(
+            personalInfo
+          );
+          // state.sectionsErrors.educations = validator.validateEducations(
+          //   educations
+          // );
+          // state.sectionsErrors.workExperiences = validator.validateWorkExperiences(
+          //   workExperiences
+          // );
+          return state;
+        });
+      }
     } else {
       // TODO Converting to PDF
 
-      const { personalInfo, educations, workExperiences } = this.state;
       this.props.onCVCreate({ personalInfo, educations, workExperiences });
     }
   };
 
   handlePersonalInfoChange = (field, value) => {
     this.setState((prevState) => {
-      let state = { personalInfo: { ...prevState.personalInfo } };
+      let state = {
+        personalInfo: { ...prevState.personalInfo },
+        sectionsErrors: {
+          ...prevState.sectionsErrors,
+          personalInfo: { ...prevState.sectionsErrors.personalInfo }
+        }
+      };
 
       switch (field) {
         case 'firstName': {
           state.personalInfo.firstName = value;
+          state.sectionsErrors.personalInfo.firstName = validator.validateName(
+            value
+          );
           break;
         }
         case 'lastName': {
           state.personalInfo.lastName = value;
+          state.sectionsErrors.personalInfo.lastName = validator.validateName(
+            value
+          );
           break;
         }
         case 'email': {
           state.personalInfo.email = value;
+          state.sectionsErrors.personalInfo.email = validator.validateEmail(
+            value
+          );
           break;
         }
         case 'phoneNumber': {
           state.personalInfo.phoneNumber = value;
+          state.sectionsErrors.personalInfo.phoneNumber = validator.validatePhone(
+            value
+          );
           break;
         }
       }
+
+      state.sectionsErrors.personalInfo.isValid = !validator.hasErrors(
+        Object.values(state.sectionsErrors.personalInfo).slice(1)
+      );
 
       return state;
     });
@@ -217,7 +304,8 @@ export default class CVForm extends React.Component {
       personalInfo,
       educations,
       workExperiences,
-      isEditableForm
+      isEditableForm,
+      sectionsErrors
     } = this.state;
 
     return (
@@ -226,6 +314,7 @@ export default class CVForm extends React.Component {
         <Grid item xs={12}>
           <PersonalInformationSection
             personalInfo={personalInfo}
+            errors={sectionsErrors.personalInfo}
             handleChange={this.handlePersonalInfoChange}
             isEditableForm={isEditableForm}
           />

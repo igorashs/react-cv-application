@@ -1,10 +1,11 @@
 import React from 'react';
 import { TextField, Grid, Button, Box } from '@material-ui/core';
+import PhoneField from 'material-ui-phone-number';
 
 export default class PersonalInformationInput extends React.Component {
   render() {
     const { firstName, lastName, email, phoneNumber } = this.props.info;
-    const { handleChange, handleClick, isEditable } = this.props;
+    const { handleChange, handleClick, isEditable, errors } = this.props;
 
     return (
       <React.Fragment>
@@ -14,6 +15,8 @@ export default class PersonalInformationInput extends React.Component {
             label='First Name'
             id='first-name'
             fullWidth
+            error={!!errors.firstName}
+            helperText={errors.firstName}
             value={firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
           />
@@ -24,6 +27,8 @@ export default class PersonalInformationInput extends React.Component {
             label='Last Name'
             id='last-name'
             fullWidth
+            error={!!errors.lastName}
+            helperText={errors.lastName}
             value={lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
           />
@@ -35,18 +40,23 @@ export default class PersonalInformationInput extends React.Component {
             type='email'
             id='email'
             fullWidth
+            error={!!errors.email}
+            helperText={errors.email}
             value={email}
             onChange={(e) => handleChange('email', e.target.value)}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
+          <PhoneField
             variant='filled'
             label='Phone Number'
             id='phone-number'
             fullWidth
+            defaultCountry={'us'}
+            error={!!errors.phoneNumber}
+            helperText={errors.phoneNumber}
             value={phoneNumber}
-            onChange={(e) => handleChange('phoneNumber', e.target.value)}
+            onChange={(value) => handleChange('phoneNumber', value)}
           />
         </Grid>
         {isEditable && (
