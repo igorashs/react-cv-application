@@ -7,7 +7,8 @@ export default class WorkExperienceList extends React.Component {
   shouldComponentUpdate(nextProp) {
     return (
       nextProp.workExperiences !== this.props.workExperiences ||
-      nextProp.isEditableForm !== this.props.isEditableForm
+      nextProp.isEditableForm !== this.props.isEditableForm ||
+      nextProp.errorsList !== this.props.errorList
     );
   }
 
@@ -16,7 +17,8 @@ export default class WorkExperienceList extends React.Component {
       workExperiences,
       handleChange,
       isEditableForm,
-      handleDelete
+      handleDelete,
+      errorsList
     } = this.props;
 
     return (
@@ -30,6 +32,7 @@ export default class WorkExperienceList extends React.Component {
             <Box minWidth='100%'>
               <WorkExperienceItem
                 workExperience={workExperience}
+                errors={errorsList.find((e) => e.id === workExperience.id)}
                 handleChange={handleChange}
                 isEditableForm={isEditableForm}
                 handleDelete={handleDelete}

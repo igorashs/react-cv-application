@@ -31,7 +31,8 @@ export default class WorkExperienceItem extends React.Component {
       nextProp.workExperience !== this.props.workExperience ||
       nextProp.isEditableForm !== this.props.isEditableForm ||
       nextProp.isAlone !== this.props.isAlone ||
-      nextState.isEditable !== this.state.isEditable
+      nextState.isEditable !== this.state.isEditable ||
+      nextProp.errors !== this.props.errors
     );
   }
 
@@ -41,14 +42,16 @@ export default class WorkExperienceItem extends React.Component {
       handleChange,
       isEditableForm,
       handleDelete,
-      isAlone
+      isAlone,
+      errors
     } = this.props;
 
     return (
       <React.Fragment>
-        {this.state.isEditable ? (
+        {this.state.isEditable || !errors.isValid ? (
           <WorkExperienceInput
             workExperience={workExperience}
+            errors={errors}
             handleChange={handleChange}
             handleClick={this.handleEdit}
             handleDeleteClick={handleDelete}

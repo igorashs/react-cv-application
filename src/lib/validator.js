@@ -61,6 +61,14 @@ const isEducationValid = (errors) => {
   );
 };
 
+const isWorkExperienceValid = (errors) => {
+  const { occupationTitle, employer, fromDate, toDate } = errors;
+
+  return !hasErrors(
+    Object.values({ occupationTitle, employer, fromDate, toDate })
+  );
+};
+
 const validatePersonalInformation = (personalInformation) => {
   const { firstName, lastName, email, phoneNumber } = personalInformation;
 
@@ -104,7 +112,90 @@ const validateEducations = (educations) => {
   return errorsList;
 };
 
-const validateWorkExperiences = (workExperiences) => {};
+const validateWorkExperiences = (workExperiences) => {
+  const errorsList = workExperiences.map((workExperience) => {
+    const {
+      occupationTitle,
+      employer,
+      fromDate,
+      toDate,
+      isOngoing,
+      id
+    } = workExperience;
+
+    const errors = {
+      occupationTitle: validateName(occupationTitle),
+      employer: validateName(employer),
+      fromDate: validateStartDate(fromDate, !isOngoing && toDate),
+      toDate: isOngoing ? '' : validateEndDate(toDate, fromDate)
+    };
+
+    return {
+      id,
+      isValid: !hasErrors(Object.values(errors)),
+      ...errors
+    };
+  });
+
+  return errorsList;
+};
+
+const areEducationCompleted = (education) => {
+  const {
+    qualificationTitle,
+    organization,
+    fromDate,
+    toDate,
+    isOngoing
+  } = education;
+
+  return (
+    !!qualificationTitle &&
+    !!organization &&
+    !!fromDate &&
+    (isOngoing || !!toDate)
+  );
+};
+
+const areWorkExperienceCompleted = (workExperience) => {
+  const {
+    occupationTitle,
+    employer,
+    fromDate,
+    toDate,
+    isOngoing
+  } = workExperience;
+
+  return (
+    !!occupationTitle && !!employer && !!fromDate && (isOngoing || !!toDate)
+  );
+};
+
+const validateForm = (personalInfo, educations, workExperiences) => {
+  const sectionsErrors = {
+    personalInfo: validatePersonalInformation(personalInfo),
+    educations: validateEducations(educations),
+    workExperiences: validateWorkExperiences(workExperiences)
+  };
+
+  const foundInvalidEducation = sectionsErrors.educations.find(
+    (ed) => !ed.isValid
+  );
+  const areEducationsValid = foundInvalidEducation ? false : true;
+
+  const foundInvalidWorkExperience = sectionsErrors.workExperiences.find(
+    (w) => !w.isValid
+  );
+
+  const areWorkExperiencesValid = foundInvalidWorkExperience ? false : true;
+
+  return [
+    sectionsErrors.personalInfo.isValid &&
+      areEducationsValid &&
+      areWorkExperiencesValid,
+    sectionsErrors
+  ];
+};
 
 export default {
   validateName,
@@ -117,5 +208,9 @@ export default {
   validateEducations,
   validateWorkExperiences,
   isPersonalInformationValid,
-  isEducationValid
+  isEducationValid,
+  isWorkExperienceValid,
+  areEducationCompleted,
+  areWorkExperienceCompleted,
+  validateForm
 };

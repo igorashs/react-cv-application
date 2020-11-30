@@ -108,7 +108,7 @@ export default class EducationInput extends React.Component {
                 variant='contained'
                 color='primary'
                 onClick={handleClick}
-                disabled={!errors.isValid}
+                disabled={!errors.isValid || !errors.areFieldsCompleted}
               >
                 Save
               </Button>

@@ -25,7 +25,8 @@ export default class WorkExperienceInput extends React.Component {
       isAlone,
       handleClick,
       isEditableForm,
-      handleDeleteClick
+      handleDeleteClick,
+      errors
     } = this.props;
 
     return (
@@ -36,6 +37,8 @@ export default class WorkExperienceInput extends React.Component {
             label='Title of the occupation'
             id='title-occupation'
             fullWidth
+            error={!!errors.occupationTitle}
+            helperText={errors.occupationTitle}
             value={occupationTitle}
             onChange={(e) =>
               handleChange('occupationTitle', e.target.value, id)
@@ -48,6 +51,8 @@ export default class WorkExperienceInput extends React.Component {
             label='Employer'
             id='employer'
             fullWidth
+            error={!!errors.employer}
+            helperText={errors.employer}
             value={employer}
             onChange={(e) => handleChange('employer', e.target.value, id)}
           />
@@ -61,6 +66,8 @@ export default class WorkExperienceInput extends React.Component {
             fullWidth
             placeholder='14/01/1970'
             disableFuture
+            error={!!errors.fromDate}
+            helperText={errors.fromDate}
             value={fromDate}
             onChange={(date) => handleChange('fromDate', date, id)}
           />
@@ -74,6 +81,8 @@ export default class WorkExperienceInput extends React.Component {
             fullWidth
             placeholder='14/01/1971'
             disableFuture
+            error={!!errors.toDate}
+            helperText={errors.toDate}
             value={toDate}
             onChange={(date) => handleChange('toDate', date, id)}
             disabled={isOngoing}
@@ -109,7 +118,12 @@ export default class WorkExperienceInput extends React.Component {
         {!isEditableForm && (
           <Grid item xs={12} sm={6}>
             <Box display='grid' gridTemplateColumns='90px'>
-              <Button variant='contained' color='primary' onClick={handleClick}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={handleClick}
+                disabled={!errors.isValid || !errors.areFieldsCompleted}
+              >
                 Save
               </Button>
             </Box>

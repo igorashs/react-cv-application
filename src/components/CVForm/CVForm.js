@@ -38,8 +38,8 @@ export default class CVForm extends React.Component {
           id: initWorkExperienceID,
           occupationTitle: '',
           employer: '',
-          fromDate: new Date(),
-          toDate: new Date(),
+          fromDate: null,
+          toDate: null,
           isOngoing: false,
           responsibilities: ''
         }
@@ -59,7 +59,8 @@ export default class CVForm extends React.Component {
             qualificationTitle: '',
             organization: '',
             fromDate: '',
-            toDate: ''
+            toDate: '',
+            areFieldsCompleted: false
           }
         ],
         workExperiences: [
@@ -70,7 +71,8 @@ export default class CVForm extends React.Component {
             employer: '',
             fromDate: '',
             toDate: '',
-            responsibilities: ''
+            responsibilities: '',
+            areFieldsCompleted: false
           }
         ]
       },
@@ -86,27 +88,29 @@ export default class CVForm extends React.Component {
     if (!this.state.isPreview) {
       window.scrollTo(0, 0);
 
-      const sectionsErrors = {
-        // !temp
-        ...this.state.sectionsErrors,
-        personalInfo: validator.validatePersonalInformation(personalInfo),
-        educations: validator.validateEducations(educations)
-      };
-
-      const foundInvalidEducation = sectionsErrors.educations.find(
-        (ed) => !ed.isValid
+      const [isValid, sectionsErrors] = validator.validateForm(
+        personalInfo,
+        educations,
+        workExperiences
       );
-      const educationsAreValid = foundInvalidEducation ? false : true;
 
-      if (sectionsErrors.personalInfo.isValid && educationsAreValid) {
+      if (isValid) {
         this.setState({ isEditableForm: false, isPreview: true });
       } else {
         this.setState({ sectionsErrors });
       }
     } else {
-      // TODO Converting to PDF
+      const [isValid, sectionsErrors] = validator.validateForm(
+        personalInfo,
+        educations,
+        workExperiences
+      );
 
-      this.props.onCVCreate({ personalInfo, educations, workExperiences });
+      if (isValid) {
+        this.props.onCVCreate({ personalInfo, educations, workExperiences });
+      } else {
+        this.setState({ sectionsErrors });
+      }
     }
   };
 
@@ -177,7 +181,8 @@ export default class CVForm extends React.Component {
         qualificationTitle: '',
         organization: '',
         fromDate: '',
-        toDate: ''
+        toDate: '',
+        areFieldsCompleted: false
       });
 
       return state;
@@ -269,6 +274,7 @@ export default class CVForm extends React.Component {
       }
 
       errors.isValid = validator.isEducationValid(errors);
+      errors.areFieldsCompleted = validator.areEducationCompleted(education);
 
       return state;
     });
@@ -277,17 +283,36 @@ export default class CVForm extends React.Component {
   handleAddWorkExperience = () => {
     this.setState((prevState) => {
       let state = {
-        workExperiences: prevState.workExperiences.map((w) => ({ ...w }))
+        workExperiences: prevState.workExperiences.map((w) => ({ ...w })),
+        sectionsErrors: {
+          ...prevState.sectionsErrors,
+          workExperiences: prevState.sectionsErrors.workExperiences.map(
+            (w) => ({ ...w })
+          )
+        }
       };
+
+      const id = uuidv4();
 
       state.workExperiences.push({
         occupationTitle: '',
         employer: '',
-        fromDate: new Date(),
-        toDate: new Date(),
+        fromDate: null,
+        toDate: null,
         isOngoing: false,
         responsibilities: '',
-        id: uuidv4()
+        id
+      });
+
+      state.sectionsErrors.workExperiences.push({
+        isValid: false,
+        id,
+        occupationTitle: '',
+        employer: '',
+        fromDate: '',
+        toDate: '',
+        responsibilities: '',
+        areFieldsCompleted: false
       });
 
       return state;
@@ -297,7 +322,13 @@ export default class CVForm extends React.Component {
   handleDeleteWorkExperience = (id) => {
     this.setState((prevState) => {
       let state = {
-        workExperiences: prevState.workExperiences.filter((w) => w.id !== id)
+        workExperiences: prevState.workExperiences.filter((w) => w.id !== id),
+        sectionsErrors: {
+          ...prevState.sectionsErrors,
+          workExperiences: prevState.sectionsErrors.workExperiences.filter(
+            (w) => w.id !== id
+          )
+        }
       };
 
       return state;
@@ -307,29 +338,71 @@ export default class CVForm extends React.Component {
   handleWorkExperienceChange = (field, value, id) => {
     this.setState((prevState) => {
       let state = {
-        workExperiences: prevState.workExperiences.map((w) => ({ ...w }))
+        workExperiences: prevState.workExperiences.map((w) => ({ ...w })),
+        sectionsErrors: {
+          ...prevState.sectionsErrors,
+          workExperiences: prevState.sectionsErrors.workExperiences.map(
+            (w) => ({ ...w })
+          )
+        }
       };
       const workExperience = state.workExperiences.find((w) => w.id === id);
+      const errors = state.sectionsErrors.workExperiences.find(
+        (w) => w.id === id
+      );
 
       switch (field) {
         case 'occupationTitle': {
           workExperience.occupationTitle = value;
+          errors.occupationTitle = validator.validateName(value);
           break;
         }
         case 'employer': {
           workExperience.employer = value;
+          errors.employer = validator.validateName(value);
           break;
         }
         case 'fromDate': {
           workExperience.fromDate = value;
+          errors.fromDate = validator.validateStartDate(
+            value,
+            !workExperience.isOngoing && workExperience.toDate
+          );
+
+          if (!errors.fromDate && errors.toDate)
+            errors.toDate = validator.validateEndDate(
+              workExperience.toDate,
+              value
+            );
           break;
         }
         case 'toDate': {
           workExperience.toDate = value;
+          errors.toDate = workExperience.isOngoing
+            ? ''
+            : validator.validateEndDate(value, workExperience.fromDate);
+
+          if (!errors.toDate && errors.fromDate)
+            errors.fromDate = validator.validateStartDate(
+              workExperience.fromDate,
+              value
+            );
           break;
         }
         case 'isOngoing': {
           workExperience.isOngoing = value;
+          if (value) {
+            errors.fromDate = validator.validateStartDate(
+              workExperience.fromDate,
+              null
+            );
+            errors.toDate = '';
+          } else {
+            errors.toDate = validator.validateEndDate(
+              workExperience.toDate,
+              workExperience.fromDate
+            );
+          }
           break;
         }
         case 'responsibilities': {
@@ -337,6 +410,11 @@ export default class CVForm extends React.Component {
           break;
         }
       }
+
+      errors.isValid = validator.isWorkExperienceValid(errors);
+      errors.areFieldsCompleted = validator.areWorkExperienceCompleted(
+        workExperience
+      );
 
       return state;
     });
@@ -377,6 +455,7 @@ export default class CVForm extends React.Component {
         <Grid item xs={12}>
           <WorkExperienceSection
             workExperiences={workExperiences}
+            errorsList={sectionsErrors.workExperiences}
             handleChange={this.handleWorkExperienceChange}
             handleAdd={this.handleAddWorkExperience}
             handleDelete={this.handleDeleteWorkExperience}
