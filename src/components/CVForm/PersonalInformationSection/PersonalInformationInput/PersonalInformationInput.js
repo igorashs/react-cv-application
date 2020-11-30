@@ -62,7 +62,12 @@ export default class PersonalInformationInput extends React.Component {
         {isEditable && (
           <Grid item xs={12} sm={6}>
             <Box display='grid' gridTemplateColumns='90px'>
-              <Button variant='contained' color='primary' onClick={handleClick}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={handleClick}
+                disabled={!errors.isValid}
+              >
                 Save
               </Button>
             </Box>

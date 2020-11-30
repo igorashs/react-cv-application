@@ -7,7 +7,8 @@ export default class EducationList extends React.Component {
   shouldComponentUpdate(nextProp) {
     return (
       nextProp.educations !== this.props.educations ||
-      nextProp.isEditableForm !== this.props.isEditableForm
+      nextProp.isEditableForm !== this.props.isEditableForm ||
+      nextProp.errorsList !== this.props.errorList
     );
   }
 
@@ -16,7 +17,8 @@ export default class EducationList extends React.Component {
       educations,
       handleChange,
       isEditableForm,
-      handleDelete
+      handleDelete,
+      errorsList
     } = this.props;
 
     return (
@@ -30,6 +32,7 @@ export default class EducationList extends React.Component {
             <Box minWidth='100%'>
               <EducationItem
                 education={education}
+                errors={errorsList.find((e) => e.id === education.id)}
                 handleChange={handleChange}
                 isEditableForm={isEditableForm}
                 handleDelete={handleDelete}

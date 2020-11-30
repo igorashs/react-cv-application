@@ -24,17 +24,20 @@ export default class EducationInput extends React.Component {
       isAlone,
       handleClick,
       isEditableForm,
-      handleDeleteClick
+      handleDeleteClick,
+      errors
     } = this.props;
 
     return (
-      <Grid container spacing={2} alignItems='flex-end'>
+      <Grid container spacing={2} alignItems='flex-start'>
         <Grid item xs={12}>
           <TextField
             variant='filled'
             label='Title of qualification awarded'
             id='title-qualification'
             fullWidth
+            error={!!errors.qualificationTitle}
+            helperText={errors.qualificationTitle}
             value={qualificationTitle}
             onChange={(e) =>
               handleChange('qualificationTitle', e.target.value, id)
@@ -47,19 +50,24 @@ export default class EducationInput extends React.Component {
             label='Organization providing education and training'
             id='education-organization'
             fullWidth
+            error={!!errors.organization}
+            helperText={errors.organization}
             value={organization}
             onChange={(e) => handleChange('organization', e.target.value, id)}
           />
         </Grid>
+
         <Grid item xs={12} sm={6} md={5}>
           <KeyboardDatePicker
             inputVariant='filled'
-            format='MM/dd/yyyy'
+            format='dd/MM/yyyy'
             label='From'
             id='edu-from-date'
             fullWidth
-            placeholder='1/1/1970'
+            placeholder='14/01/1970'
             disableFuture
+            error={!!errors.fromDate}
+            helperText={errors.fromDate}
             value={fromDate}
             onChange={(date) => handleChange('fromDate', date, id)}
           />
@@ -67,11 +75,14 @@ export default class EducationInput extends React.Component {
         <Grid item xs={12} sm={6} md={5}>
           <KeyboardDatePicker
             inputVariant='filled'
-            format='MM/dd/yyyy'
+            format='dd/MM/yyyy'
             label='To'
             id='edu-to-date'
             fullWidth
-            placeholder='1/1/1970'
+            placeholder='14/01/1971'
+            disableFuture
+            error={!!errors.toDate}
+            helperText={errors.toDate}
             value={toDate}
             onChange={(date) => handleChange('toDate', date, id)}
             disabled={isOngoing}
@@ -93,7 +104,12 @@ export default class EducationInput extends React.Component {
         {!isEditableForm && (
           <Grid item xs={12} sm={6}>
             <Box display='grid' gridTemplateColumns='90px'>
-              <Button variant='contained' color='primary' onClick={handleClick}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={handleClick}
+                disabled={!errors.isValid}
+              >
                 Save
               </Button>
             </Box>

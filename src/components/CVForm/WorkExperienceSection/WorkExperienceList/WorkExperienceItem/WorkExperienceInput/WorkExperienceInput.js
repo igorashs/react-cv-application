@@ -29,7 +29,7 @@ export default class WorkExperienceInput extends React.Component {
     } = this.props;
 
     return (
-      <Grid container spacing={2} alignItems='flex-end'>
+      <Grid container spacing={2} alignItems='flex-start'>
         <Grid item xs={12}>
           <TextField
             variant='filled'
@@ -55,11 +55,11 @@ export default class WorkExperienceInput extends React.Component {
         <Grid item xs={12} sm={6} md={5}>
           <KeyboardDatePicker
             inputVariant='filled'
-            format='MM/dd/yyyy'
+            format='dd/MM/yyyy'
             label='From'
             id='work-from-date'
             fullWidth
-            placeholder='1/1/1970'
+            placeholder='14/01/1970'
             disableFuture
             value={fromDate}
             onChange={(date) => handleChange('fromDate', date, id)}
@@ -68,10 +68,12 @@ export default class WorkExperienceInput extends React.Component {
         <Grid item xs={12} sm={6} md={5}>
           <KeyboardDatePicker
             inputVariant='filled'
-            format='MM/dd/yyyy'
+            format='dd/MM/yyyy'
             label='To'
             id='work-to-date'
             fullWidth
+            placeholder='14/01/1971'
+            disableFuture
             value={toDate}
             onChange={(date) => handleChange('toDate', date, id)}
             disabled={isOngoing}

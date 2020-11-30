@@ -27,10 +27,10 @@ export default class EducationView extends React.Component {
               <Typography variant='h6'>{qualificationTitle}</Typography>
               <Typography variant='subtitle1'>{organization}</Typography>
               <Typography variant='subtitle1'>
-                {format(fromDate, 'MM/dd/yyyy') +
+                {format(fromDate, 'dd/MM/yyyy') +
                   (isOngoing
                     ? ' - ongoing'
-                    : ` - ${format(toDate, 'MM/dd/yyyy')}`)}
+                    : ` - ${format(toDate, 'dd/MM/yyyy')}`)}
               </Typography>
             </Box>
             <Box display='grid' gridRowGap='16px'>

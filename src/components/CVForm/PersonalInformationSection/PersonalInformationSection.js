@@ -36,7 +36,9 @@ export default class PersonalInformationSection extends React.Component {
         <Divider />
         <Box mt={2.5}>
           <Grid container spacing={2}>
-            {this.props.isEditableForm || this.state.isEditable ? (
+            {this.props.isEditableForm ||
+            this.state.isEditable ||
+            !this.props.errors.isValid ? (
               <PersonalInformationInput
                 info={this.props.personalInfo}
                 errors={this.props.errors}

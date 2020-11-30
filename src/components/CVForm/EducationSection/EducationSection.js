@@ -7,7 +7,8 @@ export default class EducationSection extends React.Component {
   shouldComponentUpdate(nextProp) {
     return (
       nextProp.educations !== this.props.educations ||
-      nextProp.isEditableForm !== this.props.isEditableForm
+      nextProp.isEditableForm !== this.props.isEditableForm ||
+      nextProp.errorsList !== this.props.errorList
     );
   }
 
@@ -17,7 +18,8 @@ export default class EducationSection extends React.Component {
       handleChange,
       isEditableForm,
       handleAdd,
-      handleDelete
+      handleDelete,
+      errorsList
     } = this.props;
 
     return (
@@ -29,6 +31,7 @@ export default class EducationSection extends React.Component {
         <Box mt={2.5}>
           <EducationList
             educations={educations}
+            errorsList={errorsList}
             handleChange={handleChange}
             isEditableForm={isEditableForm}
             handleDelete={handleDelete}

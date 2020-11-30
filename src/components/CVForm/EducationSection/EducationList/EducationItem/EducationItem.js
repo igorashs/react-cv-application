@@ -31,7 +31,8 @@ export default class EducationItem extends React.Component {
       nextProp.education !== this.props.education ||
       nextProp.isEditableForm !== this.props.isEditableForm ||
       nextProp.isAlone !== this.props.isAlone ||
-      nextState.isEditable !== this.state.isEditable
+      nextState.isEditable !== this.state.isEditable ||
+      nextProp.errors !== this.props.errors
     );
   }
 
@@ -41,14 +42,16 @@ export default class EducationItem extends React.Component {
       handleChange,
       isEditableForm,
       handleDelete,
-      isAlone
+      isAlone,
+      errors
     } = this.props;
 
     return (
       <React.Fragment>
-        {this.state.isEditable ? (
+        {this.state.isEditable || !errors.isValid ? (
           <EducationInput
             education={education}
+            errors={errors}
             handleChange={handleChange}
             handleClick={this.handleEdit}
             handleDeleteClick={handleDelete}
