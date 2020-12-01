@@ -18,6 +18,7 @@
     "react-scripts": "3.4.4",
     "uuid": "^8.3.1"
   },
+  "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
