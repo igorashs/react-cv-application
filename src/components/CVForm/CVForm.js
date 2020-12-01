@@ -86,8 +86,6 @@ export default class CVForm extends React.Component {
     const { personalInfo, educations, workExperiences } = this.state;
 
     if (!this.state.isPreview) {
-      window.scrollTo(0, 0);
-
       const [isValid, sectionsErrors] = validator.validateForm(
         personalInfo,
         educations,
@@ -95,6 +93,7 @@ export default class CVForm extends React.Component {
       );
 
       if (isValid) {
+        window.scrollTo(0, 0);
         this.setState({ isEditableForm: false, isPreview: true });
       } else {
         this.setState({ sectionsErrors });

@@ -16,6 +16,11 @@ export default class CreateCVSection extends React.PureComponent {
                 {this.props.isEditableForm ? 'Preview' : 'Create PDF'}
               </Button>
             </Grid>
+            <Grid item xs={12}>
+              <Typography variant='subtitle1' color='textSecondary'>
+                Complete all fields and continue!
+              </Typography>
+            </Grid>
           </Grid>
         </Box>
       </Box>

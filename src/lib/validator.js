@@ -1,11 +1,13 @@
 const validateName = (value) => {
   if (!value) return 'This field is required';
+  if (value.length > 50) return 'Maximum Length is 50';
 
   return '';
 };
 
 const validateEmail = (value) => {
   if (!value) return 'This field is required';
+  if (value.length > 50) return 'Maximum Length is 50';
   if (!value.match(/\S+@\S+\.\S+/)) return 'Wrong email format';
 
   return '';
