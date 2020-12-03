@@ -1,60 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Divider, Grid } from '@material-ui/core';
 import PersonalInformationInput from './PersonalInformationInput';
 import PersonalInformationView from './PersonalInformationView';
 
-export default class PersonalInformationSection extends React.Component {
-  constructor(props) {
-    super(props);
+export default function PersonalInformationSection(props) {
+  const [isEditable, setIsEditable] = useState(false);
 
-    this.state = {
-      isEditable: false
-    };
-  }
-
-  handleEdit = () => {
-    this.setState((curState) => ({
-      isEditable: !curState.isEditable
-    }));
+  const handleEdit = () => {
+    setIsEditable((state) => !state);
   };
 
-  shouldComponentUpdate(nextProp, nextState) {
-    return (
-      nextProp.personalInfo !== this.props.personalInfo ||
-      nextProp.isEditableForm !== this.props.isEditableForm ||
-      nextState.isEditable !== this.state.isEditable ||
-      nextProp.errors !== this.props.errors
-    );
-  }
+  const { isEditableForm, errors, personalInfo, handleChange } = props;
 
-  render() {
-    return (
-      <Box component='section'>
-        <Typography variant='h5' component='h3'>
-          Personal Information
-        </Typography>
-        <Divider />
-        <Box mt={2.5}>
-          <Grid container spacing={2}>
-            {this.props.isEditableForm ||
-            this.state.isEditable ||
-            !this.props.errors.isValid ? (
-              <PersonalInformationInput
-                info={this.props.personalInfo}
-                errors={this.props.errors}
-                handleChange={this.props.handleChange}
-                handleClick={this.handleEdit}
-                isEditable={this.state.isEditable}
-              />
-            ) : (
-              <PersonalInformationView
-                info={this.props.personalInfo}
-                handleClick={this.handleEdit}
-              />
-            )}
-          </Grid>
-        </Box>
+  return (
+    <Box component='section'>
+      <Typography variant='h5' component='h3'>
+        Personal Information
+      </Typography>
+      <Divider />
+      <Box mt={2.5}>
+        <Grid container spacing={2}>
+          {isEditableForm || isEditable || !errors.isValid ? (
+            <PersonalInformationInput
+              info={personalInfo}
+              errors={errors}
+              handleChange={handleChange}
+              handleClick={handleEdit}
+              isEditable={isEditable}
+            />
+          ) : (
+            <PersonalInformationView
+              info={personalInfo}
+              handleClick={handleEdit}
+            />
+          )}
+        </Grid>
       </Box>
-    );
-  }
+    </Box>
+  );
 }
