@@ -4,7 +4,7 @@ import PhoneField from 'material-ui-phone-number';
 
 export default function PersonalInformationInput(props) {
   const { firstName, lastName, email, phoneNumber } = props.info;
-  const { handleChange, handleClick, isEditable, errors } = props;
+  const { handleChange, handleClick, isEditableForm, errors } = props;
 
   return (
     <React.Fragment>
@@ -58,7 +58,7 @@ export default function PersonalInformationInput(props) {
           onChange={(value) => handleChange('phoneNumber', value)}
         />
       </Grid>
-      {isEditable && (
+      {!isEditableForm && (
         <Grid item xs={12} sm={6}>
           <Box display='grid' gridTemplateColumns='90px'>
             <Button

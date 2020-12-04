@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Divider, Grid } from '@material-ui/core';
 import PersonalInformationInput from './PersonalInformationInput';
 import PersonalInformationView from './PersonalInformationView';
 
 export default function PersonalInformationSection(props) {
-  const [isEditable, setIsEditable] = useState(false);
+  const [isEditable, setIsEditable] = useState(true);
 
   const handleEdit = () => {
     setIsEditable((state) => !state);
   };
 
   const { isEditableForm, errors, personalInfo, handleChange } = props;
+
+  useEffect(() => {
+    if (!isEditableForm) {
+      setIsEditable(false);
+    }
+  }, [isEditableForm]);
 
   return (
     <Box component='section'>
@@ -20,13 +26,13 @@ export default function PersonalInformationSection(props) {
       <Divider />
       <Box mt={2.5}>
         <Grid container spacing={2}>
-          {isEditableForm || isEditable || !errors.isValid ? (
+          {isEditable ? (
             <PersonalInformationInput
               info={personalInfo}
               errors={errors}
               handleChange={handleChange}
               handleClick={handleEdit}
-              isEditable={isEditable}
+              isEditableForm={isEditableForm}
             />
           ) : (
             <PersonalInformationView
