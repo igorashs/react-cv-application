@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid } from '@material-ui/core';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,83 +9,76 @@ import CreateCVSection from './CreateCVSection';
 
 import validator from '../../lib/validator';
 
-export default class CVForm extends React.Component {
-  constructor(props) {
-    super(props);
+const initEducationID = uuidv4();
+const initWorkExperienceID = uuidv4();
 
-    const initEducationID = uuidv4();
-    const initWorkExperienceID = uuidv4();
+export default function CVForm(props) {
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: ''
+  });
+  const [educations, setEducations] = useState([
+    {
+      id: initEducationID,
+      qualificationTitle: '',
+      organization: '',
+      fromDate: null,
+      toDate: null,
+      isOngoing: false
+    }
+  ]);
+  const [workExperiences, setWorkExperiences] = useState([
+    {
+      id: initWorkExperienceID,
+      occupationTitle: '',
+      employer: '',
+      fromDate: null,
+      toDate: null,
+      isOngoing: false,
+      responsibilities: ''
+    }
+  ]);
+  const [sectionsErrors, setSectionsErrors] = useState({
+    personalInfo: {
+      isValid: false,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: ''
+    },
+    educations: [
+      {
+        isValid: false,
+        id: initEducationID,
+        qualificationTitle: '',
+        organization: '',
+        fromDate: '',
+        toDate: '',
+        areFieldsCompleted: false
+      }
+    ],
+    workExperiences: [
+      {
+        isValid: false,
+        id: initWorkExperienceID,
+        occupationTitle: '',
+        employer: '',
+        fromDate: '',
+        toDate: '',
+        responsibilities: '',
+        areFieldsCompleted: false
+      }
+    ]
+  });
+  const [isEditableForm, setIsEditableForm] = useState(true);
+  const [isPreview, setIsPreview] = useState(false);
 
-    this.state = {
-      personalInfo: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: ''
-      },
-      educations: [
-        {
-          id: initEducationID,
-          qualificationTitle: '',
-          organization: '',
-          fromDate: null,
-          toDate: null,
-          isOngoing: false
-        }
-      ],
-      workExperiences: [
-        {
-          id: initWorkExperienceID,
-          occupationTitle: '',
-          employer: '',
-          fromDate: null,
-          toDate: null,
-          isOngoing: false,
-          responsibilities: ''
-        }
-      ],
-      sectionsErrors: {
-        personalInfo: {
-          isValid: false,
-          firstName: '',
-          lastName: '',
-          email: '',
-          phoneNumber: ''
-        },
-        educations: [
-          {
-            isValid: false,
-            id: initEducationID,
-            qualificationTitle: '',
-            organization: '',
-            fromDate: '',
-            toDate: '',
-            areFieldsCompleted: false
-          }
-        ],
-        workExperiences: [
-          {
-            isValid: false,
-            id: initWorkExperienceID,
-            occupationTitle: '',
-            employer: '',
-            fromDate: '',
-            toDate: '',
-            responsibilities: '',
-            areFieldsCompleted: false
-          }
-        ]
-      },
-      isEditableForm: true,
-      isPreview: false
-    };
-  }
-
-  handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const { personalInfo, educations, workExperiences } = this.state;
 
-    if (!this.state.isPreview) {
+    if (!isPreview) {
       const [isValid, sectionsErrors] = validator.validateForm(
         personalInfo,
         educations,
@@ -94,9 +87,11 @@ export default class CVForm extends React.Component {
 
       if (isValid) {
         window.scrollTo(0, 0);
-        this.setState({ isEditableForm: false, isPreview: true });
+
+        setIsEditableForm(false);
+        setIsPreview(true);
       } else {
-        this.setState({ sectionsErrors });
+        setSectionsErrors(sectionsErrors);
       }
     } else {
       const [isValid, sectionsErrors] = validator.validateForm(
@@ -106,66 +101,58 @@ export default class CVForm extends React.Component {
       );
 
       if (isValid) {
-        this.props.onCVCreate({ personalInfo, educations, workExperiences });
+        props.onCVCreate({ personalInfo, educations, workExperiences });
       } else {
-        this.setState({ sectionsErrors });
+        setSectionsErrors(sectionsErrors);
       }
     }
   };
 
-  handlePersonalInfoChange = (field, value) => {
-    this.setState((prevState) => {
-      let state = {
-        personalInfo: { ...prevState.personalInfo },
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          personalInfo: { ...prevState.sectionsErrors.personalInfo }
-        }
-      };
-      const { personalInfo: errors } = state.sectionsErrors;
+  const handlePersonalInfoChange = (field, value) => {
+    setPersonalInfo((prevState) => {
+      const personalInfo = { ...prevState };
+      const { personalInfo: errors } = { ...sectionsErrors };
 
       switch (field) {
         case 'firstName': {
-          state.personalInfo.firstName = value;
+          personalInfo.firstName = value;
           errors.firstName = validator.validateName(value);
           break;
         }
         case 'lastName': {
-          state.personalInfo.lastName = value;
+          personalInfo.lastName = value;
           errors.lastName = validator.validateName(value);
           break;
         }
         case 'email': {
-          state.personalInfo.email = value;
+          personalInfo.email = value;
           errors.email = validator.validateEmail(value);
           break;
         }
         case 'phoneNumber': {
-          state.personalInfo.phoneNumber = value;
+          personalInfo.phoneNumber = value;
           errors.phoneNumber = validator.validatePhone(value);
           break;
         }
       }
 
       errors.isValid = validator.isPersonalInformationValid(errors);
+      setSectionsErrors((prevState) => ({
+        ...prevState,
+        personalInfo: errors
+      }));
 
-      return state;
+      return personalInfo;
     });
   };
 
-  handleAddEducation = () => {
-    this.setState((prevState) => {
-      let state = {
-        educations: prevState.educations.map((e) => ({ ...e })),
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          educations: prevState.sectionsErrors.educations.map((e) => ({ ...e }))
-        }
-      };
+  const handleAddEducation = () => {
+    const id = uuidv4();
 
-      const id = uuidv4();
+    setEducations((prevState) => {
+      const educations = prevState.map((e) => ({ ...e }));
 
-      state.educations.push({
+      educations.push({
         qualificationTitle: '',
         organization: '',
         fromDate: null,
@@ -174,7 +161,16 @@ export default class CVForm extends React.Component {
         id
       });
 
-      state.sectionsErrors.educations.push({
+      return educations;
+    });
+
+    setSectionsErrors((prevState) => {
+      const sectionsErrors = {
+        ...prevState,
+        educations: prevState.educations.map((e) => ({ ...e }))
+      };
+
+      sectionsErrors.educations.push({
         isValid: false,
         id,
         qualificationTitle: '',
@@ -184,40 +180,25 @@ export default class CVForm extends React.Component {
         areFieldsCompleted: false
       });
 
-      return state;
+      return sectionsErrors;
     });
   };
 
-  handleDeleteEducation = (id) => {
-    this.setState((prevState) => {
-      let state = {
-        educations: prevState.educations.filter((e) => e.id !== id),
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          educations: prevState.sectionsErrors.educations.filter(
-            (e) => e.id !== id
-          )
-        }
-      };
+  const handleDeleteEducation = (id) => {
+    setEducations((prevState) => prevState.filter((e) => e.id !== id));
 
-      return state;
-    });
+    setSectionsErrors((prevState) => ({
+      ...prevState,
+      educations: prevState.educations.filter((e) => e.id !== id)
+    }));
   };
 
-  handleEducationChange = (field, value, id) => {
-    this.setState((prevState) => {
-      let state = {
-        educations: prevState.educations.map((e) => ({ ...e })),
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          educations: prevState.sectionsErrors.educations.map((e) => ({ ...e }))
-        }
-      };
-
-      const education = state.educations.find((edu) => edu.id === id);
-      const errors = state.sectionsErrors.educations.find(
-        (edu) => edu.id === id
-      );
+  const handleEducationChange = (field, value, id) => {
+    setEducations((prevState) => {
+      const educations = prevState.map((e) => ({ ...e }));
+      const education = educations.find((edu) => edu.id === id);
+      const educationsErrors = sectionsErrors.educations.map((e) => ({ ...e }));
+      const errors = educationsErrors.find((edu) => edu.id === id);
 
       switch (field) {
         case 'qualificationTitle': {
@@ -275,25 +256,21 @@ export default class CVForm extends React.Component {
       errors.isValid = validator.isEducationValid(errors);
       errors.areFieldsCompleted = validator.areEducationCompleted(education);
 
-      return state;
+      setSectionsErrors((prevState) => {
+        return { ...prevState, educations: educationsErrors };
+      });
+
+      return educations;
     });
   };
 
-  handleAddWorkExperience = () => {
-    this.setState((prevState) => {
-      let state = {
-        workExperiences: prevState.workExperiences.map((w) => ({ ...w })),
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          workExperiences: prevState.sectionsErrors.workExperiences.map(
-            (w) => ({ ...w })
-          )
-        }
-      };
+  const handleAddWorkExperience = () => {
+    const id = uuidv4();
 
-      const id = uuidv4();
+    setWorkExperiences((prevState) => {
+      const workExperiences = prevState.map((w) => ({ ...w }));
 
-      state.workExperiences.push({
+      workExperiences.push({
         occupationTitle: '',
         employer: '',
         fromDate: null,
@@ -303,7 +280,16 @@ export default class CVForm extends React.Component {
         id
       });
 
-      state.sectionsErrors.workExperiences.push({
+      return workExperiences;
+    });
+
+    setSectionsErrors((prevState) => {
+      const sectionsErrors = {
+        ...prevState,
+        workExperiences: prevState.workExperiences.map((w) => ({ ...w }))
+      };
+
+      sectionsErrors.workExperiences.push({
         isValid: false,
         id,
         occupationTitle: '',
@@ -314,41 +300,27 @@ export default class CVForm extends React.Component {
         areFieldsCompleted: false
       });
 
-      return state;
+      return sectionsErrors;
     });
   };
 
-  handleDeleteWorkExperience = (id) => {
-    this.setState((prevState) => {
-      let state = {
-        workExperiences: prevState.workExperiences.filter((w) => w.id !== id),
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          workExperiences: prevState.sectionsErrors.workExperiences.filter(
-            (w) => w.id !== id
-          )
-        }
-      };
+  const handleDeleteWorkExperience = (id) => {
+    setWorkExperiences((prevState) => prevState.filter((w) => w.id !== id));
 
-      return state;
-    });
+    setSectionsErrors((prevState) => ({
+      ...prevState,
+      workExperiences: prevState.workExperiences.filter((w) => w.id !== id)
+    }));
   };
 
-  handleWorkExperienceChange = (field, value, id) => {
-    this.setState((prevState) => {
-      let state = {
-        workExperiences: prevState.workExperiences.map((w) => ({ ...w })),
-        sectionsErrors: {
-          ...prevState.sectionsErrors,
-          workExperiences: prevState.sectionsErrors.workExperiences.map(
-            (w) => ({ ...w })
-          )
-        }
-      };
-      const workExperience = state.workExperiences.find((w) => w.id === id);
-      const errors = state.sectionsErrors.workExperiences.find(
-        (w) => w.id === id
-      );
+  const handleWorkExperienceChange = (field, value, id) => {
+    setWorkExperiences((prevState) => {
+      const workExperiences = prevState.map((w) => ({ ...w }));
+      const workExperience = workExperiences.find((w) => w.id === id);
+      const workExperiencesErrors = sectionsErrors.workExperiences.map((w) => ({
+        ...w
+      }));
+      const errors = workExperiencesErrors.find((w) => w.id === id);
 
       switch (field) {
         case 'occupationTitle': {
@@ -415,57 +387,51 @@ export default class CVForm extends React.Component {
         workExperience
       );
 
-      return state;
+      setSectionsErrors((prevState) => {
+        return { ...prevState, workExperiences: workExperiencesErrors };
+      });
+
+      return workExperiences;
     });
   };
 
-  render() {
-    const {
-      personalInfo,
-      educations,
-      workExperiences,
-      isEditableForm,
-      sectionsErrors
-    } = this.state;
-
-    return (
-      <Grid container component='form' spacing={3} onSubmit={this.handleSubmit}>
-        {/* Personal Information */}
-        <Grid item xs={12}>
-          <PersonalInformationSection
-            personalInfo={personalInfo}
-            errors={sectionsErrors.personalInfo}
-            handleChange={this.handlePersonalInfoChange}
-            isEditableForm={isEditableForm}
-          />
-        </Grid>
-        {/* Education and Training*/}
-        <Grid item xs={12}>
-          <EducationSection
-            educations={educations}
-            errorsList={sectionsErrors.educations}
-            handleChange={this.handleEducationChange}
-            handleAdd={this.handleAddEducation}
-            handleDelete={this.handleDeleteEducation}
-            isEditableForm={isEditableForm}
-          />
-        </Grid>
-        {/* Work Experience */}
-        <Grid item xs={12}>
-          <WorkExperienceSection
-            workExperiences={workExperiences}
-            errorsList={sectionsErrors.workExperiences}
-            handleChange={this.handleWorkExperienceChange}
-            handleAdd={this.handleAddWorkExperience}
-            handleDelete={this.handleDeleteWorkExperience}
-            isEditableForm={isEditableForm}
-          />
-        </Grid>
-        {/* Create the CV */}
-        <Grid item xs={12}>
-          <CreateCVSection isEditableForm={isEditableForm} />
-        </Grid>
+  return (
+    <Grid container component='form' spacing={3} onSubmit={handleSubmit}>
+      {/* Personal Information */}
+      <Grid item xs={12}>
+        <PersonalInformationSection
+          personalInfo={personalInfo}
+          errors={sectionsErrors.personalInfo}
+          handleChange={handlePersonalInfoChange}
+          isEditableForm={isEditableForm}
+        />
       </Grid>
-    );
-  }
+      {/* Education and Training*/}
+      <Grid item xs={12}>
+        <EducationSection
+          educations={educations}
+          errorsList={sectionsErrors.educations}
+          handleChange={handleEducationChange}
+          handleAdd={handleAddEducation}
+          handleDelete={handleDeleteEducation}
+          isEditableForm={isEditableForm}
+        />
+      </Grid>
+      {/* Work Experience */}
+      <Grid item xs={12}>
+        <WorkExperienceSection
+          workExperiences={workExperiences}
+          errorsList={sectionsErrors.workExperiences}
+          handleChange={handleWorkExperienceChange}
+          handleAdd={handleAddWorkExperience}
+          handleDelete={handleDeleteWorkExperience}
+          isEditableForm={isEditableForm}
+        />
+      </Grid>
+      {/* Create the CV */}
+      <Grid item xs={12}>
+        <CreateCVSection isEditableForm={isEditableForm} />
+      </Grid>
+    </Grid>
+  );
 }

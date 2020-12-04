@@ -1,72 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import WorkExperienceInput from './WorkExperienceInput';
 import WorkExperienceView from './WorkExperienceView';
 
-export default class WorkExperienceItem extends React.Component {
-  constructor(props) {
-    super(props);
+export default function WorkExperienceItem(props) {
+  const [isEditable, setIsEditable] = useState(true);
+  const [isNew, setIsNew] = useState(true);
 
-    this.state = {
-      isEditable: true
-    };
-  }
-
-  handleEdit = () => {
-    this.setState((curState) => ({
-      isEditable: !curState.isEditable
-    }));
+  const handleSave = () => {
+    setIsEditable(false);
   };
 
-  shouldComponentUpdate(nextProp, nextState) {
-    if (nextProp.isEditableForm !== this.props.isEditableForm) {
-      this.setState((prevState) => {
-        if (prevState.isEditable && !nextProp.isEditableForm) {
-          return { isEditable: false };
-        }
-      });
+  const handleEdit = () => {
+    setIsEditable(true);
+  };
+
+  const {
+    workExperience,
+    handleChange,
+    isEditableForm,
+    handleDelete,
+    isAlone,
+    errors
+  } = props;
+
+  useEffect(() => {
+    if (isNew) {
+      setIsNew(false);
+      return;
     }
 
-    return (
-      nextProp.workExperience !== this.props.workExperience ||
-      nextProp.isEditableForm !== this.props.isEditableForm ||
-      nextProp.isAlone !== this.props.isAlone ||
-      nextState.isEditable !== this.state.isEditable ||
-      nextProp.errors !== this.props.errors
-    );
-  }
+    if (!isEditableForm) {
+      setIsEditable(false);
+      return;
+    }
+  }, [isEditableForm]);
 
-  render() {
-    const {
-      workExperience,
-      handleChange,
-      isEditableForm,
-      handleDelete,
-      isAlone,
-      errors
-    } = this.props;
-
-    return (
-      <React.Fragment>
-        {this.state.isEditable || !errors.isValid ? (
-          <WorkExperienceInput
-            workExperience={workExperience}
-            errors={errors}
-            handleChange={handleChange}
-            handleClick={this.handleEdit}
-            handleDeleteClick={handleDelete}
-            isEditableForm={isEditableForm}
-            isAlone={isAlone}
-          />
-        ) : (
-          <WorkExperienceView
-            workExperience={workExperience}
-            handleEditClick={this.handleEdit}
-            handleDeleteClick={handleDelete}
-            isAlone={isAlone}
-          />
-        )}
-      </React.Fragment>
-    );
-  }
+  return (
+    <React.Fragment>
+      {isEditable ? (
+        <WorkExperienceInput
+          workExperience={workExperience}
+          errors={errors}
+          handleChange={handleChange}
+          handleSaveClick={handleSave}
+          handleDeleteClick={handleDelete}
+          isEditableForm={isEditableForm}
+          isAlone={isAlone}
+        />
+      ) : (
+        <WorkExperienceView
+          workExperience={workExperience}
+          handleEditClick={handleEdit}
+          handleDeleteClick={handleDelete}
+          isAlone={isAlone}
+        />
+      )}
+    </React.Fragment>
+  );
 }
